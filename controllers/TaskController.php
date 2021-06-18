@@ -10,13 +10,16 @@ use app\models\TaskSearch;
 use app\models\db\Type;
 use app\models\db\User;
 use app\services\CommentService;
+use app\services\WorkCostService;
 use app\services\ServiceClassService;
 use app\services\StatusService;
 use app\services\TaskService;
 use app\services\TypeService;
 use app\services\UserService;
+use Exception;
 use Yii;
 use yii\web\Controller;
+use yii\web\Response;
 
 class TaskController extends Controller
 {
@@ -38,7 +41,7 @@ class TaskController extends Controller
      *
      * @return string
      */
-    public function actionIndex()
+    public function actionIndex() : string
     {
         $types = Type::find()->all();
         $users = User::find()->all();
@@ -66,13 +69,17 @@ class TaskController extends Controller
      *
      * @return string
      */
-    public function actionFullTask()
+    public function actionFullTask() : string
     {
         $id = Yii::$app->request->get('id');
         $taskService = new TaskService();
 
-        if (!$id || !$taskService->findById($id)) {
-            return $this->render('error');
+        try {
+            if (!$id || !$taskService->findById($id)) {
+                return $this->render('error');
+            }
+        } catch (Exception $e) {
+            Yii::$app->session->setFlash('error', "Something wrong");
         }
 
         $userService = new UserService();
@@ -80,20 +87,28 @@ class TaskController extends Controller
         $statusService = new StatusService();
         $serviceClassService = new ServiceClassService();
         $commentService = new CommentService();
+        $workCostService = new WorkCostService();
 
-        $task = $taskService->findById($id);
-        $author = $userService->findById($task->author_id);
-        $executor = $userService->findById($task->executor_id);
-        $type = $typeService->findById($task->type);
-        $status = $statusService->findById($task->status);
-        $serviceClass = $serviceClassService->findById($task->service_class);
+        try {
+            $task = $taskService->findById($id);
+            $author = $userService->findById($task->author_id);
+            $executor = $userService->findById($task->executor_id);
+            $type = $typeService->findById($task->type);
+            $status = $statusService->findById($task->status);
+            $serviceClass = $serviceClassService->findById($task->service_class);
 
+            $types = Type::find()->all();
+            $users = User::find()->all();
+            $statuses = Status::find()->all();
+            $serviceClasses = ServiceClass::find()->all();
+            $comments = $commentService->findByTaskId($id);
+            $work_costs = $workCostService->findByTaskId($id);
 
-        $types = Type::find()->all();
-        $users = User::find()->all();
-        $statuses = Status::find()->all();
-        $serviceClasses = ServiceClass::find()->all();
-        $comments = $commentService->findByTaskId($id);
+            $deadlined = $taskService->isDeadlined($id);
+            $time_limited = $taskService->isTimeLimited($id);
+        } catch (Exception $e) {
+            Yii::$app->session->setFlash('error', "Something wrong");
+        }
 
         return $this->render('full-task', [
             'task'=> $task,
@@ -106,7 +121,10 @@ class TaskController extends Controller
             'users'=> $users,
             'statuses'=> $statuses,
             'serviceClasses' => $serviceClasses,
-            'comments' => $comments
+            'comments' => $comments,
+            'work_costs' => $work_costs,
+            'deadlined' => $deadlined,
+            'time_limited' => $time_limited
         ]);
     }
 
@@ -115,16 +133,30 @@ class TaskController extends Controller
      *
      * @return string
      */
-    public function actionAddTask() {
+    public function actionAddTask()
+    {
         $model = new AddTaskForm();
 
         $taskService = new TaskService();
         if ($model->load(Yii::$app->request->post())) {
             if ($model->validate()) {
-                $taskService->addTask($model->type, $model->title, $model->description,
-                    $model->status, $model->executor, $model->serviceClass);
+                try {
+                    $taskService->addTask(
+                        $model->type,
+                        $model->title,
+                        $model->description,
+                        $model->status,
+                        $model->executor,
+                        $model->serviceClass,
+                        $model->deadline,
+                        $model->timeEstimate
+                    );
 
-                Yii::$app->session->setFlash('success', 'task added');
+                    Yii::$app->session->setFlash('success', 'task added');
+                } catch (Exception $e) {
+                    Yii::$app->session->setFlash('error', "Something wrong");
+                }
+
                 return $this->redirect(['task/index']);
             }
             return $this->refresh();
@@ -150,20 +182,38 @@ class TaskController extends Controller
      *
      * @return string
      */
-    public function actionUpdateTask() {
+    public function actionUpdateTask()
+    {
         $model = new AddTaskForm();
         $id = Yii::$app->request->get('id');
         $taskService = new TaskService();
 
-        if (!$id || !$taskService->findById($id)) {
-            return $this->render('error');
+        try {
+            if (!$id || !$taskService->findById($id)) {
+                return $this->render('error');
+            }
+        } catch (Exception $e) {
+            Yii::$app->session->setFlash('error', "Something wrong");
         }
 
         if ($model->load(Yii::$app->request->post())) {
-            $taskService->updateTask($id, $model->type, $model->title, $model->description,$model->status, $model->executor, $model->serviceClass);
+            try {
+                $taskService->updateTask(
+                    $id,
+                    $model->type,
+                    $model->title,
+                    $model->description,
+                    $model->status,
+                    $model->executor,
+                    $model->serviceClass
+                );
 
-            Yii::$app->session->setFlash('success', 'task updated');
-            return $this->redirect(['task/full-task?id=' . $id]);
+                Yii::$app->session->setFlash('success', 'task updated');
+            } catch (Exception $e) {
+                Yii::$app->session->setFlash('error', "Something wrong");
+            }
+
+            return $this->redirect(['task/full-task/' . $id]);
         }
 
         $types = Type::find()->all();
@@ -188,12 +238,18 @@ class TaskController extends Controller
      *
      * @return string
      */
-    public function actionDeleteTask() {
+    public function actionDeleteTask()
+    {
         $id = Yii::$app->request->get('id');
         $taskService = new TaskService();
-        $taskService->deleteTask($id);
+        try {
+            $taskService->deleteTask($id);
 
-        Yii::$app->session->setFlash('success', 'task deleted');
+            Yii::$app->session->setFlash('success', 'task deleted');
+        } catch (Exception $e) {
+            Yii::$app->session->setFlash('error', "Something wrong");
+        }
+
         return $this->redirect(['task/index']);
     }
 
@@ -210,13 +266,39 @@ class TaskController extends Controller
         $commentService = new CommentService();
         $taskService = new TaskService();
 
-        if (!$id || !$taskService->findById($id)) {
-            return $this->render('error');
+        try {
+            if (!$id || !$taskService->findById($id)) {
+                return $this->render('error');
+            }
+            $commentService->addComment($id, $text);
+            Yii::$app->session->setFlash('success', 'Сomment added');
+        } catch (Exception $e) {
+            Yii::$app->session->setFlash('error', "Something wrong");
         }
-        $commentService->addComment($id, $text);
 
-        Yii::$app->session->setFlash('success', 'comment added');
+        return $this->redirect(["task/full-task/" . $id]);
+    }
 
-        return $this->redirect(["task/full-task?id=" . $id]);
+    public function actionAddWorkCost()
+    {
+        $id = Yii::$app->request->get('id');
+        $time = Yii::$app->request->get('time');
+        $text = Yii::$app->request->get('text');
+
+        $workCostService = new WorkCostService();
+        $taskService = new TaskService();
+
+        try {
+            if (!$id || !$taskService->findById($id)) {
+                return $this->render('error');
+            }
+            $workCostService->addWorkCost($id, $time, $text);
+
+            Yii::$app->session->setFlash('success', 'work cost added');
+        } catch (Exception $e) {
+            Yii::$app->session->setFlash('error', "Something wrong");
+        }
+
+        return $this->redirect(["task/full-task/" . $id]);
     }
 }

@@ -18,6 +18,7 @@ $config = [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'tkB7Qbkwktk2nOUk5WxPBY0H-xOQ3rpZ',
+            'baseUrl'=> '',
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -50,11 +51,20 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                'site/full-task/<id:\d+>' => 'site/full-task',
-                'site/delete-task/<id:\d+>' => 'site/delete-task',
-                'site/update-task/<id:\d+>' => 'site/update-task',
-                'site/add-comment/<id:\d+>/<text:\w+>' => 'site/add-comment'
+                '' => 'site/',
+                'error' => 'site/error',
+                'login' => 'site/login',
+                'registration' => 'site/registration',
+                'error' => 'task/error',
+                'index' => 'task/index',
+                'update-task' => 'task/update-task',
+                'task/full-task/<id:\d+>' => 'task/full-task',
+                'task/delete-task/<id:\d+>' => 'task/delete-task',
+                'task/update-task/<id:\d+>' => 'task/update-task',
+                'task/add-comment/<id:\d+>/<text:\w+>' => 'task/add-comment',
+                'task/add-work-cost/<id:\d+>/<time:\w+>/<text:\w+>' => 'task/add-work-cost',
             ],
+
         ],
     ],
     'params' => $params,

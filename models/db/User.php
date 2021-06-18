@@ -2,13 +2,10 @@
 
 namespace app\models\db;
 
+use phpseclib3\Math\PrimeField\Integer;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
-/**
- * ActiveRecord user class.
-
- */
 class User extends ActiveRecord implements IdentityInterface
 {
 
@@ -22,18 +19,16 @@ class User extends ActiveRecord implements IdentityInterface
         return static::findOne(['access_token' => $token]);
     }
 
-    public static function findByUsername($username)
+    public static function findByUsername(string $username)
     {
         return User::find()
             ->where(['login' => $username])
             ->one();
     }
 
-    public function validatePassword($password) {
-        return $password == User::find()
-                ->where(['login'=> $this->login])
-                ->one()
-                ->password;
+    public function validatePassword(string $password) : bool
+    {
+        return \Yii::$app->security->validatePassword($password, $this->password);
     }
 
     /**
@@ -41,7 +36,7 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * @return Integer
      */
-    public function getId()
+    public function getId() : int
     {
         return $this->id;
     }
@@ -51,7 +46,7 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * @return String
      */
-    public function getLogin()
+    public function getLogin() : string
     {
         return $this->login;
     }

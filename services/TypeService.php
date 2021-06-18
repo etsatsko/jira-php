@@ -1,8 +1,11 @@
 <?php
 
 namespace app\services;
+
 use app\models\db\Type;
+use Exception;
 use yii\db\ActiveRecord;
+
 /**
  *
  * TypeService is the service for work with Type ActiveRecord.
@@ -14,12 +17,18 @@ class TypeService {
      *
      * @param $id Integer
      *
-     * @return Type|ActiveRecord
+     * @return Type
+     * @throws Exception
      */
-    public function findById($id) {
-        return Type::find()
+    public function findById(int $id) : Type
+    {
+        $type = Type::find()
             ->where(['id' => $id])
             ->one();
+        if ($type == null) {
+            throw new Exception("Type doesn't exist");
+        }
+        return $type;
     }
 
     /**
@@ -27,12 +36,17 @@ class TypeService {
      *
      * @param $name String
      *
-     * @return Type|ActiveRecord
+     * @return Type
+     * @throws Exception
      */
-    public function findByName($name)
+    public function findByName(string $name) : Type
     {
-        return Type::find()
+        $type = Type::find()
             ->where(['name' => $name])
             ->one();
+        if ($type == null) {
+            throw new Exception("Type doesn't exist");
+        }
+        return $type;
     }
 }

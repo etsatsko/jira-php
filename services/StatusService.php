@@ -1,7 +1,9 @@
 <?php
 
 namespace app\services;
+
 use app\models\db\Status;
+use Exception;
 use yii\db\ActiveRecord;
 
 /**
@@ -13,25 +15,36 @@ class StatusService {
      *
      * @param $id Integer
      *
-     * @return Status|ActiveRecord
+     * @return Status
+     * @throws Exception
      */
-    public function findById($id) {
-        return Status::find()
-            ->where(['id' => $id])
-            ->one();
+    public function findById(int $id) : Status
+    {
+        $status =  Status::find()
+                ->where(['id' => $id])
+                ->one();
+        if ($status == null) {
+            throw new Exception("Status doesn't exist");
+        }
+        return $status;
     }
+
     /**
      * Find and return status by name from db.
      *
      * @param $name String
      *
-     * @return Status|ActiveRecord
+     * @return Status
+     * @throws Exception
      */
-
-    public function findByName($name)
+    public function findByName(string $name) : Status
     {
-        return Status::find()
+        $status = Status::find()
             ->where(['name' => $name])
             ->one();
+        if ($status == null) {
+            throw new Exception("Status doesn't exists");
+        }
+        return $status;
     }
 }

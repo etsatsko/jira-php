@@ -44,13 +44,10 @@ class m290521_003725_add_types_statuses_service_class extends Migration
     // Use up()/down() to run migration code without a transaction.
     public function up()
     {
-
     }
-
     public function down()
     {
         echo "m290521003725_add_types__statusesServiceclass cannot be reverted.\n";
-
         return false;
     }
     */

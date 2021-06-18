@@ -1,9 +1,11 @@
 <?php
 
 namespace app\services;
+
 use app\models\db\User;
 use Yii;
 use yii\db\ActiveRecord;
+
 /**
  * UserService is the service for work with User ActiveRecord.
  */
@@ -15,11 +17,15 @@ class UserService {
      *
      * @return User|ActiveRecord
      */
-    public function findById($id)
+    public function findById(int $id) : User
     {
-        return User::find()
+        $user = User::find()
                 ->where(['id'=> $id])
                 ->one();
+        if ($user == null) {
+            throw new Exception("User doesn't exist");
+        }
+        return $user;
     }
 
     /**
@@ -29,7 +35,7 @@ class UserService {
      * @param $email String
      * @param $password String
      */
-    public function addUser($login, $email, $password)
+    public function addUser(string $login, string $email, string $password)
     {
         $user = new User();
         $user->login = $login;
@@ -37,6 +43,9 @@ class UserService {
         $user->password = $password;
         $user->create_date = Yii::$app->formatter->asDateTime('now', 'yyyy-MM-dd H:i:s');
 
-        $user->save();
+        $userSaved = $user->save();
+        if (!$userSaved) {
+            throw new Exception("User doesn't save");
+        }
     }
 }

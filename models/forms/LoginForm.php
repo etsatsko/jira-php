@@ -8,9 +8,7 @@ use yii\base\Model;
 
 /**
  * LoginForm is the model behind the login form.
- *
  * @property-read User|null $user This property is read-only.
- *
  */
 class LoginForm extends Model
 {
@@ -39,7 +37,6 @@ class LoginForm extends Model
     /**
      * Validates the password.
      * This method serves as the inline validation for password.
-     *
      * @param string $attribute the attribute currently being validated
      * @param array $params the additional name-value pairs given in the rule
      */
@@ -68,10 +65,9 @@ class LoginForm extends Model
 
     /**
      * Finds user by [[username]]
-     *
      * @return User|array|\yii\db\ActiveRecord|null
      */
-    public function getUser()
+    public function getUser() : User
     {
         if ($this->_user === false) {
             $this->_user = User::findByUsername($this->username);
@@ -80,3 +76,4 @@ class LoginForm extends Model
         return $this->_user;
     }
 }
+

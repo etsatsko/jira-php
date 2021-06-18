@@ -21,9 +21,12 @@ $form = ActiveForm::begin(['id' => 'add-task-form']); ?>
 <?= $form->field($model, 'serviceClass')->dropDownList(
     ArrayHelper::map($serviceClasses, 'id', 'name')
 ) ?>
+<?= $form->field($model, 'deadline')->textInput(['type' => 'date']) ?>
+
+<?= $form->field($model, 'timeEstimate')->textInput() ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Create', ['class' => 'btn btn-primary', 'name' => 'add-button']) ?>
+        <?= Html::submitButton('Создать', ['class' => 'btn btn-primary', 'name' => 'add-button']) ?>
     </div>
 
 <?php ActiveForm::end(); ?>

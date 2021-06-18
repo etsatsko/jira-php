@@ -19,7 +19,7 @@ class TaskSearch extends Task
     {
         // only fields in rules() are searchable
         return [
-            [['id', 'status', 'type', 'service_class'], 'integer'],
+            [['id', 'status', 'type', 'service_class', 'author_id', 'executor_id'], 'integer'],
             [['title', 'create_date'], 'safe'],
         ];
     }
@@ -44,7 +44,8 @@ class TaskSearch extends Task
             'pagination' => [
                 'pageSize' => 5,
             ],
-            'sort' => ['attributes' => ['id', 'type', 'title', 'author', 'executor', 'status', 'create_date', 'service_class']],
+            'sort' => ['attributes' => ['id', 'type', 'title', 'author', 'executor',
+                                        'status', 'create_date', 'service_class']],
         ]);
 
         // load the search form data and validate
@@ -56,6 +57,8 @@ class TaskSearch extends Task
         $query->andFilterWhere(['id' => $this->id]);
         $query->andFilterWhere(['status' => $this->status]);
         $query->andFilterWhere(['type' => $this->type]);
+        $query->andFilterWhere(['author_id' => $this->author_id]);
+        $query->andFilterWhere(['executor_id' => $this->executor_id]);
         $query->andFilterWhere(['service_class' => $this->service_class]);
         $query->andFilterWhere(['like', 'title', $this->title])
             ->andFilterWhere(['like', 'create_date', $this->create_date]);

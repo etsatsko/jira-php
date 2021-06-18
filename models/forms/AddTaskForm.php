@@ -16,6 +16,8 @@ class AddTaskForm extends Model
     public $executor;
     public $status;
     public $serviceClass;
+    public $deadline;
+    public $timeEstimate;
 
     /**
      * @return array the validation rules.
@@ -23,8 +25,9 @@ class AddTaskForm extends Model
     public function rules()
     {
         return [
-            [['title', 'type', 'status', 'executor', 'serviceClass'], 'required'],
+            [['title', 'type', 'status', 'executor', 'serviceClass', 'deadline', 'timeEstimate'], 'required'],
             ['description', 'string'],
         ];
     }
 }
+

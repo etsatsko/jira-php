@@ -14,7 +14,7 @@ class Task extends ActiveRecord
      *
      * @return String
      */
-    public static function tableName()
+    public static function tableName() : string
     {
         return 'task';
     }
@@ -24,7 +24,7 @@ class Task extends ActiveRecord
      *
      * @return Integer
      */
-    public function getId()
+    public function getId() : int
     {
         return $this->id;
     }
@@ -34,7 +34,7 @@ class Task extends ActiveRecord
      *
      * @return String
      */
-    public function getTitle()
+    public function getTitle() : string
     {
         return $this->title;
     }

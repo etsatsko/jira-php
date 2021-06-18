@@ -1,14 +1,20 @@
 <?php
 
 namespace app\services;
+
 use app\models\db\Task;
+use DateTime;
+use Exception;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveRecord;
+
 /**
  * TaskService is the service for work with Task ActiveRecord.
  */
-class TaskService {
+class TaskService
+{
     /**
      * Create and save task to db.
      *
@@ -18,9 +24,21 @@ class TaskService {
      * @param $status Integer
      * @param $executor Integer
      * @param $service_class Integer
-     * @throws \yii\base\InvalidConfigException
+     * @param string $deadline
+     * @param int $timeEstimate
+     * @throws InvalidConfigException
      */
-    public function addTask($type, $title, $description, $status, $executor, $service_class) {
+    public function addTask(
+        int $type,
+        string $title,
+        string $description,
+        int $status,
+        int $executor,
+        int $service_class,
+        string $deadline,
+        int $timeEstimate
+    )
+    {
         $task = new Task();
         $task->type = $type;
         $task->title = $title;
@@ -28,11 +46,13 @@ class TaskService {
         $task->author_id = Yii::$app->user->id;
         $task->executor_id = $executor;
         $task->create_date = Yii::$app->formatter->asDateTime('now', 'yyyy-MM-dd H:i:s');
+        $task->deadline = Yii::$app->formatter->asDateTime($deadline, 'yyyy-MM-dd H:i:s');
         $task->service_class = $service_class;
+        $task->time_estimate = $timeEstimate;
 
         if (!isset($description)) {
             $task->description = "";
-        }else {
+        } else {
             $task->description = $description;
         }
 
@@ -49,8 +69,18 @@ class TaskService {
      * @param $status Integer
      * @param $executor Integer
      * @param $service_class Integer
+     * @throws Exception
      */
-    public function updateTask($id,$type, $title, $description, $status, $executor, $service_class) {
+    public function updateTask(
+        int $id,
+        int $type,
+        string $title,
+        string $description,
+        int $status,
+        int $executor,
+        int $service_class
+    )
+    {
         $task = $this->findById($id);
         $task->type = $type;
         $task->title = $title;
@@ -60,11 +90,14 @@ class TaskService {
 
         if (!isset($description)) {
             $task->description = "";
-        }else {
+        } else {
             $task->description = $description;
         }
 
-        $task->save();
+        $taskSaved = $task->save();
+        if (!$taskSaved) {
+            throw new Exception("Task doesn't save");
+        }
     }
 
     /**
@@ -72,11 +105,16 @@ class TaskService {
      * Delete task from db.
      *
      * @param $id Integer
+     * @throws Exception
      */
-    public function deleteTask($id) {
+    public function deleteTask(int $id)
+    {
         $task = $this->findById($id);
         if (isset($task)) {
-            $task->delete();
+            $deleted = $task->delete();
+            if (!$deleted) {
+                throw new Exception("Task doesn't delete");
+            }
         }
     }
 
@@ -86,11 +124,17 @@ class TaskService {
      * @param $id Integer
      *
      * @return Task|ActiveRecord
+     * @throws Exception
      */
-    public function findById($id) {
-        return Task::find()
+    public function findById(int $id): Task
+    {
+        $task = Task::find()
             ->where(['id' => $id])
             ->one();
+        if ($task == null) {
+            throw new Exception("Task doesn't exist");
+        }
+        return $task;
     }
 
     /**
@@ -99,10 +143,57 @@ class TaskService {
      * @param $title String
      *
      * @return array|ActiveRecord[]
+     * @throws Exception
      */
-    public function findByTitle($title) {
-        return Task::find()
+    public function findByTitle(string $title): array
+    {
+        $tasks = Task::find()
             ->andWhere(['like', 'title', $title])
             ->all();
+        if ($tasks == null) {
+            throw new Exception("Tasks don't exist");
+        }
+        return $tasks;
+    }
+
+    /**
+     * Return is task deadlined
+     *
+     * @param $id int
+     *
+     * @return bool
+     * @throws Exception
+     */
+    public function isDeadlined(int $id) : bool
+    {
+        $task = Task::find()
+            ->where(['id' => $id])
+            ->one();
+        if ($task == null) {
+            throw new Exception("Task doesn't exist");
+        }
+        $timeNow = Yii::$app->formatter->asDateTime('now', 'yyyy-MM-dd H:i:s');
+        return $timeNow > $task->deadline;
+    }
+
+    /**
+     * Return is task time limited
+     *
+     * @param $id int
+     *
+     * @return bool
+     * @throws Exception
+     */
+    public function isTimeLimited(int $id) : bool
+    {
+        $task = Task::find()
+            ->where(['id' => $id])
+            ->one();
+        if ($task == null) {
+            throw new Exception("Task doesn't exist");
+        }
+        $workCostService = new WorkCostService();
+        $sum = $workCostService->getSumWorkCostsByTaskId($id);
+        return $sum > $task->time_estimate;
     }
 }

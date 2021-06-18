@@ -14,35 +14,37 @@ class m290521_000209_db extends Migration
     {
         $this->createTable('{{%user}}', [
             'id' => $this->primaryKey(),
-            'login' => $this->text()->notNull(),
-            'email' => $this->text()->notNull(),
-            'password' => $this->text()->notNull(),
+            'login' => $this->string(150)->notNull()->unique(),
+            'email' => $this->string(150)->notNull(),
+            'password' => $this->string(150)->notNull(),
             'create_date'=> $this->dateTime(),
         ]);
 
         $this->createTable('{{%type}}', [
             'id' => $this->primaryKey(),
-            'name' => $this->text()->notNull(),
+            'name' => $this->string(150)->notNull(),
         ]);
 
         $this->createTable('{{%status}}', [
             'id' => $this->primaryKey(),
-            'name' => $this->text()->notNull(),
+            'name' => $this->string(150)->notNull(),
         ]);
         $this->createTable('{{%service_class}}', [
             'id' => $this->primaryKey(),
-            'name' => $this->text()->notNull(),
+            'name' => $this->string(150)->notNull(),
         ]);
 
         $this->createTable('{{%task}}', [
             'id' => $this->primaryKey(),
             'type' => $this->integer()->notNull(),
-            'title' => $this->text()->notNull(),
-            'description' => $this->text()->notNull(),
-            'status'=> $this->text()->notNull(),
+            'title' => $this->string(150)->notNull(),
+            'description' => $this->string(150)->notNull(),
+            'status'=> $this->string(150)->notNull(),
             'author_id'=> $this->integer()->notNull(),
             'executor_id' => $this->integer()->notNull(),
             'create_date'=> $this->dateTime()->notNull(),
+            'deadline'=> $this->dateTime()->notNull(),
+            'time_estimate'=> $this->integer()->notNull(),
             'service_class'=> $this->integer()->notNull(),
         ]);
 
@@ -110,7 +112,7 @@ class m290521_000209_db extends Migration
             'id' => $this->primaryKey(),
             'task_id' => $this->integer()->notNull(),
             'author_id' => $this->integer()->notNull(),
-            'text' => $this->text()->notNull(),
+            'text' => $this->string(150)->notNull(),
             'create_date'=> $this->dateTime(),
         ]);
 
@@ -222,19 +224,4 @@ class m290521_000209_db extends Migration
 
         $this->dropTable('{{%comment}}');
     }
-
-    /*
-    // Use up()/down() to run migration code without a transaction.
-    public function up()
-    {
-
-    }
-
-    public function down()
-    {
-        echo "m290521022109_db cannot be reverted.\n";
-
-        return false;
-    }
-    */
 }

@@ -47,14 +47,16 @@ $this->title = 'Public tasks';
                         return $users[$task->author_id - 1]->login;
                     },
                     'label' => 'Author',
-                    'attribute' => 'author'
+                    'attribute' => 'author',
+                    'filter' => Html::activeDropDownList($searchModel, 'author_id', ArrayHelper::map($users, 'id', 'login'),['class'=>'form-control','prompt' => 'Select Author']),
                 ],
                 [
                     'value' => function ($task) use ($users){
                         return $users[$task->executor_id - 1]->login;
                     },
                     'label' => 'Executor',
-                    'attribute' => 'executor'
+                    'attribute' => 'executor',
+                    'filter' => Html::activeDropDownList($searchModel, 'executor_id', ArrayHelper::map($users, 'id', 'login'),['class'=>'form-control','prompt' => 'Select Executor']),
                 ],
                 [
                     'value' => function ($task) use ($statuses){
@@ -83,5 +85,3 @@ $this->title = 'Public tasks';
         ]);
         ?>
 </div>
-
-

@@ -68,11 +68,13 @@ class SiteController extends Controller
 
         if ($model->load(Yii::$app->request->post())) {
             if ($model->validate()) {
-                $userService->addUser($model->login, $model->email, $model->password);
+                $userService->addUser($model->login, 
+                    $model->email, 
+                    \Yii::$app->security->generatePasswordHash($model->password));
 
                 Yii::$app->session->setFlash('success', 'user signed up');
+                return $this->redirect(["site/login"]);
             }
-            return $this->redirect(["site/login"]);
         }
 
         return $this->render('registration', [

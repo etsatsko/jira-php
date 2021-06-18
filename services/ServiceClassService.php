@@ -1,7 +1,9 @@
 <?php
 
 namespace app\services;
+
 use app\models\db\ServiceClass;
+use Exception;
 use yii\db\ActiveRecord;
 
 /**
@@ -13,12 +15,19 @@ class ServiceClassService {
      *
      * @param $id Integer
      *
-     * @return ServiceClass|ActiveRecord
+     * @return ServiceClass
+     * @throws Exception
      */
-    public function findById($id) {
-        return ServiceClass::find()
-            ->where(['id' => $id])
-            ->one();
+    public function findById(int $id) : ServiceClass
+    {
+        $serviceClass = ServiceClass::find()
+                    ->where(['id' => $id])
+                    ->one();
+
+        if ($serviceClass == null) {
+            throw new Exception("Service Class doesn't exist");
+        }
+        return $serviceClass;
     }
 
     /**
@@ -26,12 +35,17 @@ class ServiceClassService {
      *
      * @param $name String
      *
-     * @return ServiceClass|ActiveRecord
+     * @return ServiceClass
+     * @throws Exception
      */
-    public function findByName($name)
+    public function findByName(string $name) : ServiceClass
     {
-        return ServiceClass::find()
-            ->where(['name' => $name])
-            ->one();
+        $serviceClass = ServiceClass::find()
+                    ->where(['name' => $name])
+                    ->one();
+        if ($serviceClass == null) {
+            throw new Exception("Service Class doesn't exist");
+        }
+        return $serviceClass;
     }
 }

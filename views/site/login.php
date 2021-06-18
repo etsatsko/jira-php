@@ -41,6 +41,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php ActiveForm::end(); ?>
 
     <div>
-        <a href="/site/registration"><button type="button" class="btn btn-primary">Registration</button></a>
+        <a href="/registration">
+            <button type="button" class="btn btn-primary" style="display: flex; margin-right: auto; margin-left: auto;">Registration</button>
+        </a>
     </div>
 </div>

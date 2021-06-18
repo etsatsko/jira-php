@@ -14,7 +14,7 @@ class ServiceClass extends ActiveRecord
      *
      * @return Integer
      */
-    public function getId()
+    public function getId() : int
     {
         return $this->id;
     }
@@ -24,7 +24,7 @@ class ServiceClass extends ActiveRecord
      *
      * @return String
      */
-    public function getName()
+    public function getName() : string
     {
         return $this->name;
     }

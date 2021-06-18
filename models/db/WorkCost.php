@@ -7,10 +7,10 @@ use yii\db\ActiveRecord;
 /**
  * ActiveRecord comment class.
  */
-class Comment extends ActiveRecord
+class WorkCost extends ActiveRecord
 {
     /**
-     * Method get comment id.
+     * Method get work cost id.
      *
      * @return Integer
      */
