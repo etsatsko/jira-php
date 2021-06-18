@@ -258,10 +258,9 @@ class TaskController extends Controller
      *
      * @return string
      */
-    public function actionAddComment()
+    public function actionAddComment($id)
     {
-        $id = Yii::$app->request->get('id');
-        $text = Yii::$app->request->get('text');
+        $text = Yii::$app->request->getBodyParams('text');
 
         $commentService = new CommentService();
         $taskService = new TaskService();
@@ -279,11 +278,10 @@ class TaskController extends Controller
         return $this->redirect(["task/full-task/" . $id]);
     }
 
-    public function actionAddWorkCost()
+    public function actionAddWorkCost($id)
     {
-        $id = Yii::$app->request->get('id');
-        $time = Yii::$app->request->get('time');
-        $text = Yii::$app->request->get('text');
+        $time = Yii::$app->request->getBodyParams('time');
+        $text = Yii::$app->request->getBodyParams('text');
 
         $workCostService = new WorkCostService();
         $taskService = new TaskService();

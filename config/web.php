@@ -63,6 +63,8 @@ $config = [
                 'task/update-task/<id:\d+>' => 'task/update-task',
                 'task/add-comment/<id:\d+>/<text:\w+>' => 'task/add-comment',
                 'task/add-work-cost/<id:\d+>/<time:\w+>/<text:\w+>' => 'task/add-work-cost',
+                'POST /task/add-comment/<id:\d+>' => 'task/add-comment',
+                'POST /task/add-work-cost/<id:\d+>' => 'task/add-work-cost',
             ],
 
         ],

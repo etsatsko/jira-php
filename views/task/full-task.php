@@ -38,11 +38,12 @@ $this->params['breadcrumbs'][] = $this->title;
             var id = <?=$task->id?>;
             var text = document.getElementById("comment").value;
 
-            var url = "/task/add-comment/" + id + "/" + text;
+            var url = "/task/add-comment/" + id;
 
             $http({
                 method: 'POST',
                 url: url,
+                data: JSON.stringify({text: text}),
                 success: function(data)
                 {
                     alert(data);
@@ -62,11 +63,12 @@ $this->params['breadcrumbs'][] = $this->title;
             var text = document.getElementById("workcost").value;
             var time = document.getElementById("work_time").value;
 
-            var url = "/task/add-work-cost/" + id + "/" + time +"/" + text;
-            
+            var url = "/task/add-work-cost/" + id;
+
             $http({
                 method: 'POST',
                 url: url,
+                data: JSON.stringify({time: time, text: text}),
                 success: function(data)
                 {
                     alert(data);
