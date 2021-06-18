@@ -37,7 +37,18 @@ $this->params['breadcrumbs'][] = $this->title;
         function add_comment() {
             var id = <?=$task->id?>;
             var text = document.getElementById("comment").value;
-            window.location.replace("/task/add-comment/" + id + "/" + text);
+
+            var url = "/task/add-comment/" + id + "/" + text;
+
+            $http({
+                method: 'POST',
+                url: url,
+                success: function(data)
+                {
+                    alert(data);
+                }
+            });
+            // window.location.replace("/task/add-comment/" + id + "/" + text);
         }
     </script>
     <button class="btn btn-primary" onclick="add_comment()">Добавить комментарий</button>
@@ -50,7 +61,18 @@ $this->params['breadcrumbs'][] = $this->title;
             var id = <?=$task->id?>;
             var text = document.getElementById("workcost").value;
             var time = document.getElementById("work_time").value;
-            window.location.replace("/task/add-work-cost/" + id + "/" + time +"/" + text);
+
+            var url = "/task/add-work-cost/" + id + "/" + time +"/" + text;
+            
+            $http({
+                method: 'POST',
+                url: url,
+                success: function(data)
+                {
+                    alert(data);
+                }
+            });
+            // window.location.replace("/task/add-work-cost/" + id + "/" + time +"/" + text);
         }
     </script>
     <button class="btn btn-primary" onclick="add_work_cost()">Добавить трудозатраты</button>

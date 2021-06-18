@@ -16,7 +16,7 @@ class m300617_035631_add_work_cost extends Migration
             'id' => $this->primaryKey(),
             'task_id' => $this->integer()->notNull(),
             'author_id' => $this->integer()->notNull(),
-            'time' => $this->string(150)->notNull(),
+            'time' => $this->integet()->notNull(),
             'comment' => $this->string(150)->notNull(),
             'create_date'=> $this->dateTime(),
         ]);
